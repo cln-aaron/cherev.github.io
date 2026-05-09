@@ -21,9 +21,9 @@
 //   browser holds a persisted flag). Set to "" to disable expiry.
 // ============================================================================
 const FORMSPREE_ID       = "xvzlwlpw";
-const ACCESS_HASH        = "89f89c95ed8121ab709c3a12b9d7598043464f4d897bf77752fa3cb006621934";
+const ACCESS_HASH        = "81e8d0ce9f21b500eaccd8b53a62ab308352512d269fcd3cd23058ba562115cf";
 const ACCESS_EXPIRES_AT  = "2026-05-12T16:00:00+08:00";  // 4pm SGT, Tue 12 May 2026
-const ACCESS_STORAGE_KEY = "cvb-access-granted";  // separate from progress so RESET doesn't clear it
+const ACCESS_STORAGE_KEY = "cvb-access-granted-v2";  // separate from progress so RESET doesn't clear it
 
 // ---- Code obfuscation ----------------------------------------------------
 // XOR each code byte with KEY[j%len] ^ ((i*7+13)&0xFF) where i is level index.
