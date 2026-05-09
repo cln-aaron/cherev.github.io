@@ -791,6 +791,10 @@ function show(id) {
   for (const s of document.querySelectorAll(".screen")) s.hidden = true;
   document.getElementById(id).hidden = false;
   window.scrollTo({ top: 0, behavior: "instant" });
+  // Mini-Aaron reacts to screen changes (no-op until mounted post-gate).
+  if (id === "screen-home")          showAaronFor("home");
+  else if (id === "screen-level")    showAaronFor("level", currentLevel && currentLevel.n);
+  else if (id === "screen-results")  showAaronFor("results");
 }
 
 function bindNav() {
@@ -1155,7 +1159,84 @@ function unlockAndBoot() {
   renderHome();
   refreshTimerVisibility();
   refreshNav();
+  mountAaronMini();
+  showAaronFor("home");
   if (isComplete() && !progress.submitted) renderResults();
+}
+
+// ---- Mini Aaron (decorative, desktop-only) ------------------------------
+const AARON_LINES_HOME = [
+  "PICK A VAULT 🔓",
+  "20 TO CRACK!",
+  "LET'S GOOO 💚",
+  "STUCK? TAP HINT.",
+  "SPEEDRUN MODE ⏱",
+];
+const AARON_LINES_RESULTS = [
+  "GG NOOB ⭐",
+  "SUBMIT THAT SCORE!",
+  "RESPECT 💚",
+  "YOU COOKED.",
+];
+const AARON_LINES_LEVEL = {
+   1: ["EASY START 😎",        "WARM UP."],
+   2: ["BACON HAIR ENERGY 🥓", "BE CHEEKY."],
+   3: ["POSH KID 👑",          "PATIENCE."],
+   4: ["OLD-SCHOOL VIBES 🪙",  "RESPECT THE OG."],
+   5: ["BE CAREFUL 🐷",        "STAY CREATIVE."],
+   6: ["TRICKY 🚪",            "FILTER ACTIVE."],
+   7: ["SO SWEET 🦄",          "DON'T BE FOOLED."],
+   8: ["ATTENTION! 🪖",        "10-HUT!"],
+   9: ["FANCY 🏠",             "MIND THE RULES."],
+  10: ["BIG BOSS 💼",          "HALFWAY!"],
+  11: ["OG ERA ⚔️",            "KNIGHT VIBES."],
+  12: ["HACKER VIBES 🛠️",     "CLI ONLY."],
+  13: ["SPOOKY 👤",            "KNOW YOUR LORE."],
+  14: ["RESPECT 🐔",           "OG ADMIN."],
+  15: ["TRUST NOTHING ⚔️",    "WATCH FOR LIES."],
+  16: ["BOO 👻",               "SPEAK SOFTLY."],
+  17: ["STAGES! 🟧",           "THINK FINAL STAGE."],
+  18: ["FASHION 👜",           "ICONIC ONLY."],
+  19: ["ALMOST OUT 🚓",        "HOLD GROUND."],
+  20: ["FINAL BOSS 👁️",       "GLHF 💚"],
+};
+
+let aaronMiniMounted = false;
+let aaronMiniTimer = null;
+
+function mountAaronMini() {
+  if (aaronMiniMounted) return;
+  const sourceSvg = document.querySelector("#screen-gate .aaron-char");
+  const stage = document.getElementById("aaronMiniStage");
+  if (!sourceSvg || !stage) return;
+  const clone = sourceSvg.cloneNode(true);
+  stage.appendChild(clone);
+  stage.addEventListener("click", () => {
+    // Re-cycle a line for whichever screen is currently visible.
+    const visible = Array.from(document.querySelectorAll(".screen"))
+      .find(s => !s.hidden);
+    const id = visible ? visible.id : "screen-home";
+    if (id === "screen-level" && currentLevel)      showAaronFor("level", currentLevel.n);
+    else if (id === "screen-results")               showAaronFor("results");
+    else                                            showAaronFor("home");
+  });
+  aaronMiniMounted = true;
+}
+
+function showAaronFor(kind, n) {
+  if (!aaronMiniMounted) return;
+  let pool;
+  if (kind === "level")        pool = AARON_LINES_LEVEL[n] || [];
+  else if (kind === "results") pool = AARON_LINES_RESULTS;
+  else                         pool = AARON_LINES_HOME;
+  if (!pool.length) return;
+  const line = pool[Math.floor(Math.random() * pool.length)];
+  const bubble = document.getElementById("aaronMiniBubble");
+  const text   = document.getElementById("aaronMiniText");
+  text.textContent = line;
+  bubble.classList.add("visible");
+  clearTimeout(aaronMiniTimer);
+  aaronMiniTimer = setTimeout(() => bubble.classList.remove("visible"), 5500);
 }
 
 function showExpiredGate() {
