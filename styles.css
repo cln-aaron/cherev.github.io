@@ -967,6 +967,52 @@ body.locked .aaron-mini { display: none; }
   grid-template-columns: 1fr 1fr;
   gap: 12px 14px;
 }
+.auto-summary {
+  grid-column: 1 / -1;
+  background: #0a0d12;
+  border: 2px solid #000;
+  border-bottom-width: 4px;
+  border-left: 6px solid var(--brick-glow);
+  border-radius: 4px;
+  padding: 12px 14px;
+  user-select: none;
+}
+.auto-summary-label {
+  font-family: "Press Start 2P", monospace;
+  font-size: 9px;
+  color: var(--brick-glow);
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
+  text-shadow: 0 0 10px #2ee62e66;
+}
+.auto-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px 10px;
+}
+.auto-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.auto-cell .k {
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  color: var(--ink-dim);
+  letter-spacing: 1.5px;
+}
+.auto-cell .v {
+  font-family: "Press Start 2P", monospace;
+  font-size: 13px;
+  color: var(--ink);
+  text-shadow: 0 0 6px #2ee62e44;
+  letter-spacing: 1px;
+  word-break: break-word;
+}
+@media (max-width: 760px) {
+  .auto-summary-grid { grid-template-columns: repeat(2, 1fr); }
+  .auto-cell .v { font-size: 11px; }
+}
 .score-form .field { display: flex; flex-direction: column; gap: 4px; }
 .score-form .field.full { grid-column: 1 / -1; }
 .score-form label {
