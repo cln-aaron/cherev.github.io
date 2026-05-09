@@ -689,23 +689,101 @@ main, header, footer { position: relative; z-index: 1; }
 .form-status.ok { color: var(--brick-glow); }
 .form-status.err { color: var(--warn); }
 
-/* ---- Mobile ---- */
-@media (max-width: 640px) {
-  .topbar { padding: 10px 12px; }
-  .brand { font-size: 12px; gap: 8px; }
+/* ---- Mobile (tablet & phone) ---- */
+@media (max-width: 760px) {
+  /* Top bar reflows: brand+timer on row 1, nav buttons on row 2 */
+  .topbar {
+    padding: 10px 12px 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+    row-gap: 8px;
+  }
+  .brand { font-size: 11px; gap: 8px; flex: 1 1 auto; }
   .stud { width: 22px; height: 22px; }
-  .nav-btn { padding: 6px 10px; font-size: 10px; }
-  .screen { padding: 18px 12px 50px; }
-  .hero h1 { font-size: 18px; }
-  .level-head { grid-template-columns: auto 1fr; }
+  .timer-wrap { padding: 4px 10px; font-size: 11px; order: 2; }
+  .topnav { order: 3; flex: 1 1 100%; justify-content: space-between; }
+  .nav-btn { padding: 8px 10px; font-size: 10px; flex: 1; min-height: 36px; }
+
+  .screen { padding: 18px 12px 60px; }
+  .hero h1 { font-size: 18px; line-height: 1.5; }
+  .hero-blurb { font-size: 14px; }
+
+  /* Level grid: smaller cards, more per row on small screens */
+  .level-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  .level-card { min-height: 130px; padding: 12px 10px 10px; }
+  .level-card .nm { font-size: 14px; }
+  .level-card .blurb { font-size: 11px; }
+
+  /* Level header collapses */
+  .level-head { grid-template-columns: auto 1fr; padding: 12px; gap: 12px; }
   .level-head .status { grid-column: 1 / -1; text-align: center; }
-  .avatar { width: 56px; height: 56px; font-size: 30px; }
-  .chat { height: 320px; }
-  .guess-form { grid-template-columns: 1fr; }
-  .guess-form label { text-align: center; }
-  .timer-wrap { padding: 4px 10px; font-size: 11px; }
-  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .avatar { width: 52px; height: 52px; font-size: 28px; }
+  .level-meta h2 { font-size: 18px; }
+
+  /* Hint row */
+  .hint-row { flex-wrap: wrap; gap: 8px; }
+  .hint-status { font-size: 11px; flex: 1 1 100%; }
+  .hint-btn { min-height: 40px; }
+
+  /* Chat */
+  .chat { height: 50vh; min-height: 280px; padding: 10px; }
+  .msg { max-width: 88%; font-size: 14px; padding: 9px 11px; }
+
+  /* Inputs: 16px font-size prevents iOS Safari from zooming on focus */
+  .chat-form input,
+  .guess-form input,
+  .score-form input,
+  .score-form select {
+    font-size: 16px;
+    min-height: 44px;
+  }
+  .chat-form button,
+  .guess-form button { min-height: 44px; padding: 10px 14px; }
+
+  /* Guess form stacks */
+  .guess-form { grid-template-columns: 1fr; gap: 8px; }
+  .guess-form label { text-align: left; }
+
+  /* Foot nav buttons */
+  .level-foot .nav-btn { min-height: 40px; padding: 8px 14px; }
+
+  /* Stats + skills + results */
+  .stats-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .stat { padding: 10px 8px; }
   .stat-value { font-size: 14px; }
-  .score-form { grid-template-columns: 1fr; }
-  .results { padding: 18px 16px; }
+  .stat-label { font-size: 8px; }
+  .results { padding: 18px 14px; }
+  .results h1 { font-size: 18px; line-height: 1.5; }
+  .results h2 { font-size: 12px; }
+  .skills-list { grid-template-columns: 1fr; }
+
+  /* Score form stacks */
+  .score-form { grid-template-columns: 1fr; gap: 10px; }
+  .submit-btn { min-height: 48px; font-size: 12px; }
+
+  /* Help screen tighter */
+  .help { padding: 16px 14px; }
+  .help h2 { font-size: 14px; }
+  .help h3 { font-size: 11px; }
 }
+
+/* ---- Very small phones (<400px) ---- */
+@media (max-width: 400px) {
+  .brand .title { font-size: 10px; }
+  .timer-wrap { font-size: 10px; padding: 4px 8px; }
+  .nav-btn { font-size: 9px; padding: 8px 6px; }
+  .level-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+  .level-card { min-height: 120px; }
+  .level-card .av { font-size: 24px; }
+  .level-card .nm { font-size: 13px; }
+  .hero h1 { font-size: 16px; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .msg { max-width: 92%; font-size: 13px; }
+}
+
+/* Always: prevent horizontal scroll surprises */
+html, body { overflow-x: hidden; max-width: 100%; }
+img, video { max-width: 100%; }
