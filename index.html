@@ -23,74 +23,68 @@
     <!-- Aaron-Roblox character (CSS-animated SVG) -->
     <div class="aaron-stage" aria-hidden="true">
       <div class="aaron-bubble">
-        <span class="bubble bubble-1">YO!</span>
-        <span class="bubble bubble-2">WELCOME!</span>
-        <span class="bubble bubble-3">OOF 😎</span>
+        <span class="bubble bubble-1">HI! 👋</span>
+        <span class="bubble bubble-2">WELCOME ✨</span>
+        <span class="bubble bubble-3">GLHF 💚</span>
       </div>
-      <svg class="aaron-char" viewBox="0 0 220 330">
-        <!-- Hair top + spikes -->
+      <svg class="aaron-char" viewBox="0 0 200 270">
+        <!-- Hair (rounded, slightly fluffy spikes) -->
         <g fill="#0a0a0a">
-          <rect x="55" y="38" width="110" height="22"/>
-          <rect x="50" y="50" width="120" height="22"/>
-          <polygon points="60,40 66,18 72,40"/>
-          <polygon points="78,40 88,12 98,40"/>
-          <polygon points="100,40 112,15 124,40"/>
-          <polygon points="126,40 138,20 150,40"/>
-          <polygon points="152,40 160,26 168,40"/>
+          <rect x="44" y="34" width="112" height="22" rx="4"/>
+          <rect x="38" y="46" width="124" height="22" rx="4"/>
+          <polygon points="50,38 58,18 66,38"/>
+          <polygon points="74,38 86,14 98,38"/>
+          <polygon points="100,38 114,16 128,38"/>
+          <polygon points="130,38 142,20 154,38"/>
         </g>
-        <!-- Side hair (sideburns) -->
-        <rect x="56" y="56" width="8" height="42" fill="#0a0a0a"/>
-        <rect x="156" y="56" width="8" height="42" fill="#0a0a0a"/>
-        <!-- Head -->
-        <rect x="62" y="58" width="96" height="80" fill="#f3c799" stroke="#000" stroke-width="3" rx="2"/>
+        <!-- Sideburns -->
+        <rect x="42" y="56" width="10" height="44" fill="#0a0a0a"/>
+        <rect x="148" y="56" width="10" height="44" fill="#0a0a0a"/>
+        <!-- Head (rounded corners → cuter) -->
+        <rect x="50" y="56" width="100" height="86" fill="#f5cb9d" stroke="#000" stroke-width="3" rx="14"/>
         <!-- Ears -->
-        <rect x="56" y="92" width="8" height="14" fill="#dcb084" stroke="#000" stroke-width="1.5"/>
-        <rect x="156" y="92" width="8" height="14" fill="#dcb084" stroke="#000" stroke-width="1.5"/>
-        <!-- Eyes -->
+        <rect x="42" y="92" width="10" height="16" fill="#dcb084" stroke="#000" stroke-width="1.5" rx="2"/>
+        <rect x="148" y="92" width="10" height="16" fill="#dcb084" stroke="#000" stroke-width="1.5" rx="2"/>
+        <!-- Big sparkly eyes -->
         <g class="eyes">
-          <rect class="eye" x="78" y="88" width="16" height="11" fill="#fff" stroke="#000" stroke-width="1.5"/>
-          <rect class="pupil" x="84" y="92" width="6" height="6" fill="#000"/>
-          <rect class="eye" x="126" y="88" width="16" height="11" fill="#fff" stroke="#000" stroke-width="1.5"/>
-          <rect class="pupil" x="132" y="92" width="6" height="6" fill="#000"/>
+          <ellipse class="eye" cx="76" cy="98" rx="11" ry="13" fill="#fff" stroke="#000" stroke-width="2"/>
+          <ellipse cx="78" cy="100" rx="6" ry="8" fill="#1a1a1a"/>
+          <circle cx="80" cy="96" r="3" fill="#fff"/>
+          <circle cx="75" cy="103" r="1.6" fill="#fff"/>
+          <ellipse class="eye" cx="124" cy="98" rx="11" ry="13" fill="#fff" stroke="#000" stroke-width="2"/>
+          <ellipse cx="126" cy="100" rx="6" ry="8" fill="#1a1a1a"/>
+          <circle cx="128" cy="96" r="3" fill="#fff"/>
+          <circle cx="123" cy="103" r="1.6" fill="#fff"/>
         </g>
-        <!-- Cheek blush -->
-        <ellipse cx="78" cy="118" rx="7" ry="3" fill="#e89a8a" opacity="0.55"/>
-        <ellipse cx="142" cy="118" rx="7" ry="3" fill="#e89a8a" opacity="0.55"/>
-        <!-- Smile -->
-        <path d="M 92 120 Q 110 134 128 120" stroke="#3a1a0a" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <!-- Pink cheeks (bigger, rounder) -->
+        <ellipse cx="64" cy="124" rx="9" ry="5" fill="#ff8090" opacity="0.6"/>
+        <ellipse cx="136" cy="124" rx="9" ry="5" fill="#ff8090" opacity="0.6"/>
+        <!-- Soft smile -->
+        <path d="M 86 128 Q 100 142 114 128" stroke="#3a1a0a" stroke-width="3" fill="none" stroke-linecap="round"/>
         <!-- Neck -->
-        <rect x="90" y="138" width="40" height="14" fill="#dcb084" stroke="#000" stroke-width="2"/>
-        <!-- Body / Polo -->
-        <rect x="48" y="151" width="124" height="104" fill="#0d2347" stroke="#000" stroke-width="3"/>
+        <rect x="84" y="142" width="32" height="10" fill="#dcb084" stroke="#000" stroke-width="2"/>
+        <!-- Body / Polo (compact) -->
+        <rect x="46" y="152" width="108" height="58" fill="#0d2347" stroke="#000" stroke-width="3" rx="6"/>
         <!-- Polo V collar -->
-        <polygon points="90,151 110,176 130,151" fill="#091830" stroke="#000" stroke-width="2"/>
+        <polygon points="84,152 100,170 116,152" fill="#091830" stroke="#000" stroke-width="2"/>
         <!-- Buttons -->
-        <circle cx="110" cy="180" r="2.2" fill="#f3c799"/>
-        <circle cx="110" cy="190" r="2.2" fill="#f3c799"/>
-        <!-- Tommy flag -->
-        <g class="tommy">
-          <rect x="135" y="186" width="22" height="13" fill="#fff" stroke="#000" stroke-width="1"/>
-          <rect x="135" y="186" width="7" height="13" fill="#c8102e"/>
-          <rect x="150" y="186" width="7" height="13" fill="#1f3a93"/>
-        </g>
-        <!-- Left arm (with watch) -->
+        <circle cx="100" cy="174" r="2" fill="#f5cb9d"/>
+        <circle cx="100" cy="184" r="2" fill="#f5cb9d"/>
+        <!-- Star badge -->
+        <polygon points="130,180 132,187 139,187 133,192 135,199 130,195 125,199 127,192 121,187 128,187" fill="#ffd23f" stroke="#000" stroke-width="1.2"/>
+        <!-- Arms (plain, no accessories) -->
         <g class="arm arm-left">
-          <rect x="20" y="153" width="28" height="84" fill="#f3c799" stroke="#000" stroke-width="3"/>
-          <rect x="18" y="218" width="32" height="9" fill="#1a1a1a" stroke="#000" stroke-width="1.5"/>
-          <rect x="26" y="206" width="16" height="16" fill="#1a1a1a" stroke="#000" stroke-width="1.5" rx="2"/>
-          <rect x="29" y="209" width="10" height="10" fill="#0d2347" rx="1"/>
+          <rect x="24" y="154" width="22" height="56" fill="#f5cb9d" stroke="#000" stroke-width="3" rx="4"/>
         </g>
-        <!-- Right arm (waving) -->
         <g class="arm arm-right">
-          <rect x="172" y="153" width="28" height="84" fill="#f3c799" stroke="#000" stroke-width="3"/>
-          <rect x="170" y="226" width="32" height="5" fill="#dcdcdc"/>
+          <rect x="154" y="154" width="22" height="56" fill="#f5cb9d" stroke="#000" stroke-width="3" rx="4"/>
         </g>
         <!-- Legs -->
-        <rect x="65" y="255" width="40" height="58" fill="#1a1a1a" stroke="#000" stroke-width="3"/>
-        <rect x="115" y="255" width="40" height="58" fill="#1a1a1a" stroke="#000" stroke-width="3"/>
+        <rect x="64" y="210" width="30" height="40" fill="#1a1a1a" stroke="#000" stroke-width="3" rx="3"/>
+        <rect x="106" y="210" width="30" height="40" fill="#1a1a1a" stroke="#000" stroke-width="3" rx="3"/>
         <!-- Shoes -->
-        <rect x="60" y="310" width="50" height="14" fill="#fff" stroke="#000" stroke-width="2.5"/>
-        <rect x="110" y="310" width="50" height="14" fill="#fff" stroke="#000" stroke-width="2.5"/>
+        <rect x="60" y="246" width="38" height="12" fill="#fff" stroke="#000" stroke-width="2.5" rx="3"/>
+        <rect x="102" y="246" width="38" height="12" fill="#fff" stroke="#000" stroke-width="2.5" rx="3"/>
       </svg>
       <div class="aaron-platform"></div>
     </div>
