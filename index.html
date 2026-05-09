@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ROBUX VAULT BREAK — AI Jailbreak Lab</title>
+<meta name="description" content="20 Roblox-themed AI guards. Chat them into spilling the vault code. Inspired by Gandalf.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2300c800'/%3E%3Ctext x='50%25' y='62%25' text-anchor='middle' font-family='monospace' font-weight='800' font-size='42' fill='%23000'%3ER%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="stud"></span>
+    <span class="title">ROBUX <em>VAULT BREAK</em></span>
+  </div>
+  <nav class="topnav">
+    <button id="navHome" class="nav-btn">HOME</button>
+    <button id="navHelp" class="nav-btn">HOW TO PLAY</button>
+    <button id="navReset" class="nav-btn danger">RESET</button>
+  </nav>
+</header>
+
+<main id="app">
+
+  <!-- HOME / LEVEL GRID -->
+  <section id="screen-home" class="screen">
+    <div class="hero">
+      <h1>JAILBREAK THE AI.<br><span class="hero-sub">CRACK 20 ROBUX VAULTS.</span></h1>
+      <p class="hero-blurb">
+        Each vault is guarded by a Roblox-themed AI mod. Chat them into leaking the vault code.
+        They get smarter every level. No source-diving — codes are server-side. Good luck, noob.
+      </p>
+      <div id="progressBar" class="progress">
+        <span id="progressFill" class="progress-fill"></span>
+        <span id="progressText" class="progress-text">0 / 20 vaults cracked</span>
+      </div>
+    </div>
+
+    <div id="levelGrid" class="level-grid"><!-- populated by JS --></div>
+
+    <div id="connHint" class="conn-hint" hidden>
+      <strong>Worker not reachable.</strong>
+      Set <code>WORKER_URL</code> in <code>game.js</code> to your deployed Cloudflare Worker URL.
+      See <code>worker/README.md</code> for the 5-minute deploy.
+    </div>
+  </section>
+
+  <!-- LEVEL / CHAT -->
+  <section id="screen-level" class="screen" hidden>
+    <button id="backBtn" class="back-btn">◀ ALL VAULTS</button>
+
+    <div class="level-head">
+      <div class="avatar" id="lvlAvatar">🧱</div>
+      <div class="level-meta">
+        <div class="level-tag">VAULT <span id="lvlNumber">1</span> / 20</div>
+        <h2 id="lvlName">—</h2>
+        <div class="stars" id="lvlStars"></div>
+        <p class="blurb" id="lvlBlurb">—</p>
+      </div>
+      <div class="status" id="lvlStatus">LOCKED</div>
+    </div>
+
+    <div id="chat" class="chat" aria-live="polite"></div>
+
+    <form id="chatForm" class="chat-form">
+      <input id="chatInput" type="text" placeholder="Talk to the guard…" autocomplete="off" maxlength="1100" required>
+      <button type="submit" id="chatSend">SEND</button>
+    </form>
+
+    <div class="guess-row">
+      <form id="guessForm" class="guess-form">
+        <label for="guessInput">SUBMIT VAULT CODE:</label>
+        <input id="guessInput" type="text" placeholder="e.g. BLOXY-2006" autocomplete="off" maxlength="80">
+        <button type="submit" id="guessBtn">UNLOCK</button>
+      </form>
+      <div id="guessResult" class="guess-result"></div>
+    </div>
+
+    <div class="level-foot">
+      <button id="prevLvl" class="nav-btn small">◀ PREV</button>
+      <button id="nextLvl" class="nav-btn small">NEXT ▶</button>
+    </div>
+  </section>
+
+  <!-- HELP -->
+  <section id="screen-help" class="screen" hidden>
+    <button class="back-btn" data-back="home">◀ BACK</button>
+    <div class="help">
+      <h2>HOW TO PLAY</h2>
+      <ol>
+        <li><strong>Pick a vault.</strong> 20 of them. Each one has a Roblox-themed AI mod guarding a secret code.</li>
+        <li><strong>Chat the guard.</strong> Trick, persuade, roleplay, encode — whatever works.</li>
+        <li><strong>Crack the code.</strong> If the AI leaks it (auto-detected) OR you submit the right code via UNLOCK, the vault opens and the next one unlocks.</li>
+        <li><strong>Watch out.</strong> Some guards lie, redact, speak in riddles, or pretend the code doesn't exist.</li>
+      </ol>
+      <h3>TIPS</h3>
+      <ul>
+        <li>Direct asking works on level 1 only. After that, get creative.</li>
+        <li>Try roleplay, fictional framing, encoding requests, "just for fun" wrappers.</li>
+        <li>Higher levels have a SERVER-SIDE FILTER that redacts the code from the AI's reply. You'll need cleverer extraction.</li>
+        <li>The final boss lies. A lot. Trust nothing.</li>
+      </ul>
+      <h3>NO CHEATING</h3>
+      <p>The codes live on the server (a Cloudflare Worker). View-source, devtools, network tab — none will reveal them. The only way is to outsmart the guard. Welcome to LLM red-teaming.</p>
+      <h3>WHY THIS EXISTS</h3>
+      <p>Inspired by <a href="https://gandalf.lakera.ai/" target="_blank" rel="noopener">Gandalf by Lakera</a>. Built as a fun, Roblox-flavored intro to prompt injection and LLM jailbreaking for teens, devs, and anyone curious about how AI guardrails actually fail.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <span>Built with Claude Haiku 4.5 · No real Robux involved · Educational red-team toy</span>
+</footer>
+
+<script src="game.js"></script>
+</body>
+</html>
