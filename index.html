@@ -92,7 +92,7 @@
       <h1>ACCESS REQUIRED</h1>
       <p class="gate-sub">Enter the access code to unlock the lab.</p>
       <form id="gateForm" class="gate-form" autocomplete="off">
-        <input id="gateInput" type="password" placeholder="ACCESS CODE" autocomplete="off" autocapitalize="characters" spellcheck="false" required>
+        <input id="gateInput" type="password" inputmode="numeric" pattern="[0-9]*" placeholder="8-DIGIT CODE" autocomplete="off" spellcheck="false" maxlength="8" required>
         <button type="submit" id="gateBtn">UNLOCK ▶</button>
       </form>
       <div id="gateStatus" class="gate-status"></div>
