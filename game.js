@@ -9,7 +9,7 @@
 // Without it, the score form shows a "not configured" message instead.
 // Get one free at https://formspree.io — create a form, copy the ID.
 // ============================================================================
-const FORMSPREE_ID = "";  // e.g. "xrgjlbqp"
+const FORMSPREE_ID = "xvzlwlpw";
 
 // ---- Code obfuscation ----------------------------------------------------
 // XOR each code byte with KEY[j%len] ^ ((i*7+13)&0xFF) where i is level index.
