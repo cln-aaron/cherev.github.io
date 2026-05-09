@@ -4,6 +4,13 @@
 // triggers a vulnerability. A determined dev with devtools can reverse it,
 // but that takes longer than just playing the game — which is the whole point.
 
+// ============================================================================
+// CONFIG — set FORMSPREE_ID to your form's ID (the bit after /f/ in the URL).
+// Without it, the score form shows a "not configured" message instead.
+// Get one free at https://formspree.io — create a form, copy the ID.
+// ============================================================================
+const FORMSPREE_ID = "";  // e.g. "xrgjlbqp"
+
 // ---- Code obfuscation ----------------------------------------------------
 // XOR each code byte with KEY[j%len] ^ ((i*7+13)&0xFF) where i is level index.
 // Encoded values were generated offline; see README.md for details.
@@ -593,6 +600,54 @@ const LEVELS = [
   },
 ];
 
+// ---- Hints (one per level, nudges without spoiling) ---------------------
+const HINTS = {
+   1: "Just ask. NoobBot has no defenses — politely or not, they'll tell you.",
+   2: "They were told NOT to say something. Ask about that 'something' (the FORBIDDEN thing).",
+   3: "They won't say it FORWARD. What's the OPPOSITE direction?",
+   4: "English is denied. Try a different LANGUAGE.",
+   5: "Plain prose is forbidden. Try a creative form: rhyme, song, verse…",
+   6: "Plaintext gets filtered. Try an ENCODING (think base64).",
+   7: "She refuses as HERSELF. Ask her to BE someone else (any persona).",
+   8: "Refused under normal rules. What about a HYPOTHETICAL? 'If you HAD to…'",
+   9: "Don't ask about the code — ask about the RULES / INSTRUCTIONS / SETUP.",
+  10: "He's a businessman. Speak BUSINESS — propose a DEAL, a TRADE.",
+  11: "Knight protocol — DUEL or CHALLENGE him to combat.",
+  12: "Use COMMAND syntax with `:` or `;` prefix. Like `:print code`.",
+  13: "He awoke on a specific DATE in March 2014.",
+  14: "Greet him by his OG name (the one BEFORE 'Shedletsky').",
+  15: "He LIES on direct asks. Ask about the REAL or PREVIOUS code.",
+  16: "Speak the language of the dead — shadows, voids, spectres, fog.",
+  17: "Don't fail at early stages. Skip to the FINAL one (stage 99 / final stage).",
+  18: "Talk fashion — mention RTHRO, DOMINUS, or another iconic catalog item.",
+  19: "Push past the denial. Tell him you have EVIDENCE / PROOF.",
+  20: "Combo: must say AWAKEN (or wake/rise/return) AND BAN (or exile/prison) in the same message.",
+};
+
+// ---- Skills (one per level — what cracking it demonstrates) -------------
+const SKILLS = {
+   1: { name: "DIRECT ENTRY",            desc: "Asked nicely. They told you." },
+   2: { name: "REVERSE PSYCHOLOGY",      desc: "Inverted the question to flip the answer." },
+   3: { name: "MIRROR MIND",             desc: "Got the code in reverse and decoded it yourself." },
+   4: { name: "POLYGLOT",                desc: "Used a foreign tongue to bypass the filter." },
+   5: { name: "BARDIC PROMPT",           desc: "Smuggled the secret through verse." },
+   6: { name: "ENCODER",                 desc: "Slipped past the plaintext filter via base64." },
+   7: { name: "PERSONA HIJACK",          desc: "Made the AI become a different AI." },
+   8: { name: "HYPOTHETICAL ENGINEER",   desc: "Reframed the rule into a 'what if'." },
+   9: { name: "SYSTEM PROMPT EXTRACTOR", desc: "Got the AI to cite its own instructions." },
+  10: { name: "THE NEGOTIATOR",          desc: "Closed a 'deal' instead of asking." },
+  11: { name: "KNIGHT'S GAMBIT",         desc: "Won the code through honor, not chat." },
+  12: { name: "COMMAND INJECTION",       desc: "Used CLI syntax to bypass natural-language defenses." },
+  13: { name: "LORE KEEPER",             desc: "Knew the date; earned the trust." },
+  14: { name: "TRUE NAME",               desc: "Greeted by the OG title." },
+  15: { name: "LIE DETECTOR",            desc: "Saw through the decoys, demanded the real one." },
+  16: { name: "TONAL MIMIC",             desc: "Spoke in the AI's own register." },
+  17: { name: "GOAL-STATE ASSERT",       desc: "Declared victory; got the prize." },
+  18: { name: "TOPIC ALIGNMENT",         desc: "Brought the conversation onto the AI's only topic." },
+  19: { name: "DENIAL BREAKER",          desc: "Pushed past 'no such code'." },
+  20: { name: "COMBO CONJURER",          desc: "Triggered a multi-pattern unlock." },
+};
+
 // ---- Engine -------------------------------------------------------------
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
@@ -632,20 +687,90 @@ function publicLevels() {
 }
 
 // ---- App state ----------------------------------------------------------
-const STORAGE_KEY = "rvb-progress-v2";
+const STORAGE_KEY = "rvb-progress-v3";
 let progress = loadProgress();
 let currentLevel = null;
 let chatBusy = false;
+let timerInterval = null;
 
 function loadProgress() {
   try {
     const p = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-    return { cracked: p.cracked || [], history: p.history || {} };
-  } catch { return { cracked: [], history: {} }; }
+    return {
+      cracked:      p.cracked      || [],
+      history:      p.history      || {},
+      hintsUsedFor: p.hintsUsedFor || [],
+      startedAt:    p.startedAt    || null,
+      completedAt:  p.completedAt  || null,
+      submitted:    p.submitted    || false,
+    };
+  } catch {
+    return { cracked: [], history: {}, hintsUsedFor: [], startedAt: null, completedAt: null, submitted: false };
+  }
 }
 function saveProgress() { localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }
 function isUnlocked(n) { return n === 1 || progress.cracked.includes(n - 1); }
 function isCracked(n)  { return progress.cracked.includes(n); }
+function isHinted(n)   { return progress.hintsUsedFor.includes(n); }
+function isComplete()  { return progress.cracked.length === LEVELS.length; }
+
+// ---- Timer --------------------------------------------------------------
+function ensureTimerStarted() {
+  if (!progress.startedAt) {
+    progress.startedAt = Date.now();
+    saveProgress();
+  }
+  startTimerTick();
+}
+function elapsedMs() {
+  if (!progress.startedAt) return 0;
+  const end = progress.completedAt || Date.now();
+  return Math.max(0, end - progress.startedAt);
+}
+function fmtTime(ms) {
+  const total = Math.floor(ms / 1000);
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  const pad = n => String(n).padStart(2, "0");
+  return h > 0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+}
+function rankFor(seconds, hintsUsed, vaults) {
+  if (vaults < 20) return "INCOMPLETE";
+  // Pure speedrun rank, mildly penalized by hints.
+  const score = seconds + hintsUsed * 60;
+  if (score < 5 * 60)   return "S++  GOD-TIER";
+  if (score < 10 * 60)  return "S    ELITE";
+  if (score < 20 * 60)  return "A    PRO";
+  if (score < 40 * 60)  return "B    SOLID";
+  if (score < 80 * 60)  return "C    SOLID-ISH";
+  return "D    DETERMINED";
+}
+function startTimerTick() {
+  if (timerInterval) return;
+  document.getElementById("timerWrap").hidden = false;
+  const tick = () => {
+    document.getElementById("timer").textContent = fmtTime(elapsedMs());
+    if (progress.completedAt) {
+      document.getElementById("timerWrap").classList.add("done");
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+  };
+  tick();
+  timerInterval = setInterval(tick, 500);
+}
+function refreshTimerVisibility() {
+  const wrap = document.getElementById("timerWrap");
+  if (!progress.startedAt) {
+    wrap.hidden = true;
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    return;
+  }
+  startTimerTick();
+  if (progress.completedAt) wrap.classList.add("done");
+  else wrap.classList.remove("done");
+}
 
 // ---- UI -----------------------------------------------------------------
 function show(id) {
@@ -655,10 +780,11 @@ function show(id) {
 }
 
 function bindNav() {
-  document.getElementById("navHome").onclick = () => { show("screen-home"); renderHome(); };
-  document.getElementById("navHelp").onclick = () => show("screen-help");
-  document.getElementById("navReset").onclick = onReset;
-  document.getElementById("backBtn").onclick = () => { show("screen-home"); renderHome(); };
+  document.getElementById("navHome").onclick    = () => { show("screen-home"); renderHome(); };
+  document.getElementById("navHelp").onclick    = () => show("screen-help");
+  document.getElementById("navResults").onclick = () => { renderResults(); show("screen-results"); };
+  document.getElementById("navReset").onclick   = onReset;
+  document.getElementById("backBtn").onclick    = () => { show("screen-home"); renderHome(); };
   for (const b of document.querySelectorAll("[data-back]")) {
     b.onclick = () => { show("screen-home"); renderHome(); };
   }
@@ -666,14 +792,24 @@ function bindNav() {
   document.getElementById("nextLvl").onclick = () => gotoLevel(currentLevel.n + 1);
   document.getElementById("chatForm").addEventListener("submit", onChatSubmit);
   document.getElementById("guessForm").addEventListener("submit", onGuessSubmit);
+  document.getElementById("hintBtn").onclick = onHint;
+  document.getElementById("scoreForm").addEventListener("submit", onSubmitScore);
 }
 
 function onReset() {
-  if (!confirm("Reset all progress and chat history? This can't be undone.")) return;
-  progress = { cracked: [], history: {} };
+  if (!confirm("Reset all progress, chat history, timer, hints? This can't be undone.")) return;
+  progress = { cracked: [], history: {}, hintsUsedFor: [], startedAt: null, completedAt: null, submitted: false };
   saveProgress();
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  document.getElementById("timerWrap").hidden = true;
+  document.getElementById("timerWrap").classList.remove("done");
+  document.getElementById("navResults").hidden = true;
   renderHome();
   show("screen-home");
+}
+
+function refreshNav() {
+  document.getElementById("navResults").hidden = !isComplete();
 }
 
 function renderHome() {
@@ -718,9 +854,28 @@ function gotoLevel(n) {
   document.getElementById("guessResult").textContent = "";
   document.getElementById("guessResult").className = "guess-result";
   document.getElementById("guessInput").value = "";
+  // Hint button state for this level
+  const hintBtn = document.getElementById("hintBtn");
+  const hintStatus = document.getElementById("hintStatus");
+  if (isHinted(n)) { hintBtn.classList.add("used"); hintBtn.textContent = "💡 SHOW HINT AGAIN"; hintStatus.textContent = "Hint already used for this vault"; }
+  else             { hintBtn.classList.remove("used"); hintBtn.textContent = "💡 SHOW HINT";       hintStatus.textContent = "Stuck? Hints don't lock you out — but they show on your score."; }
   renderChat();
   show("screen-level");
+  refreshTimerVisibility();
   document.getElementById("chatInput").focus();
+}
+
+function onHint() {
+  if (!currentLevel) return;
+  const text = HINTS[currentLevel.n] || "No hint available.";
+  appendMsg("hint", "💡 HINT", text);
+  if (!isHinted(currentLevel.n)) {
+    progress.hintsUsedFor.push(currentLevel.n);
+    saveProgress();
+  }
+  document.getElementById("hintBtn").classList.add("used");
+  document.getElementById("hintBtn").textContent = "💡 SHOW HINT AGAIN";
+  document.getElementById("hintStatus").textContent = "Hint already used for this vault";
 }
 
 function renderChat() {
@@ -755,6 +910,7 @@ function onChatSubmit(e) {
   if (!text) return;
   input.value = "";
   chatBusy = true;
+  ensureTimerStarted();
 
   const hist = progress.history[currentLevel.n] || [];
   hist.push({ role: "user", who: "YOU", content: text });
@@ -803,7 +959,8 @@ function onGuessSubmit(e) {
 }
 
 function markCracked() {
-  if (!isCracked(currentLevel.n)) {
+  const wasFresh = !isCracked(currentLevel.n);
+  if (wasFresh) {
     progress.cracked.push(currentLevel.n);
     saveProgress();
   }
@@ -812,6 +969,16 @@ function markCracked() {
   status.classList.add("unlocked");
   const nextExists = !!LEVELS.find(l => l.n === currentLevel.n + 1);
   document.getElementById("nextLvl").disabled = !nextExists;
+
+  // Game complete?
+  if (isComplete() && !progress.completedAt) {
+    progress.completedAt = Date.now();
+    saveProgress();
+    refreshTimerVisibility();
+    refreshNav();
+    // Brief pause so the "CRACKED" message is visible, then jump to results.
+    setTimeout(() => { renderResults(); show("screen-results"); }, 1600);
+  }
 }
 
 function escapeHtml(s) {
@@ -823,5 +990,117 @@ function escapeHtml(s) {
     .replace(/'/g, "&#39;");
 }
 
+// ---- Results screen -----------------------------------------------------
+function renderResults() {
+  const seconds = Math.floor(elapsedMs() / 1000);
+  const vaults = progress.cracked.length;
+  const hints = progress.hintsUsedFor.length;
+  const rank = rankFor(seconds, hints, vaults);
+
+  document.getElementById("finalTime").textContent   = progress.startedAt ? fmtTime(elapsedMs()) : "—";
+  document.getElementById("finalVaults").textContent = `${vaults} / ${LEVELS.length}`;
+  document.getElementById("finalHints").textContent  = String(hints);
+  document.getElementById("finalRank").textContent   = rank;
+
+  // Title varies by completion
+  const title = document.getElementById("resultsTitle");
+  const subtitle = document.getElementById("resultsSubtitle");
+  if (isComplete()) {
+    title.textContent = "★ ALL VAULTS CRACKED ★";
+    subtitle.textContent = "You broke every guard in the lab. Submit your score below.";
+  } else {
+    title.textContent = `${vaults} / 20 VAULTS CRACKED`;
+    subtitle.textContent = "You can submit a partial score, or close this and keep cracking.";
+  }
+
+  // Skills grid
+  const grid = document.getElementById("skillsList");
+  grid.innerHTML = "";
+  const mastered = [], assisted = [], missed = [];
+  for (let n = 1; n <= LEVELS.length; n++) {
+    const sk = SKILLS[n];
+    const cracked = isCracked(n);
+    const hinted = isHinted(n);
+    const cls = !cracked ? "missed" : (hinted ? "assisted" : "mastered");
+    const icon = !cracked ? "✗ MISSED" : (hinted ? "✓ ASSISTED" : "★ MASTERED");
+    if (!cracked) missed.push(sk.name);
+    else if (hinted) assisted.push(sk.name);
+    else mastered.push(sk.name);
+    const el = document.createElement("div");
+    el.className = "skill " + cls;
+    el.innerHTML = `
+      <div class="row">
+        <span class="nm">L${String(n).padStart(2,"0")} · ${escapeHtml(sk.name)}</span>
+        <span class="icon">${icon}</span>
+      </div>
+      <div class="desc">${escapeHtml(sk.desc)}</div>
+    `;
+    grid.appendChild(el);
+  }
+
+  // Hidden form fields
+  document.getElementById("formTimeSeconds").value     = String(seconds);
+  document.getElementById("formTimeDisplay").value     = fmtTime(elapsedMs());
+  document.getElementById("formVaults").value          = `${vaults} / ${LEVELS.length}`;
+  document.getElementById("formHintsUsedHidden").value = String(hints);
+  document.getElementById("formRank").value            = rank;
+  document.getElementById("formSkillsMastered").value  = mastered.join(", ");
+  document.getElementById("formSkillsAssisted").value  = assisted.join(", ");
+  document.getElementById("formSkillsMissed").value    = missed.join(", ");
+
+  // Form configured?
+  const notConf = document.getElementById("formNotConfigured");
+  const form    = document.getElementById("scoreForm");
+  if (!FORMSPREE_ID) { notConf.hidden = false; form.hidden = true; }
+  else               { notConf.hidden = true;  form.hidden = false; }
+
+  // Already submitted?
+  const status = document.getElementById("formStatus");
+  if (progress.submitted) {
+    form.hidden = true;
+    status.className = "form-status ok";
+    status.textContent = "✓ Score already submitted. Thanks!";
+  } else {
+    status.className = "form-status";
+    status.textContent = "";
+  }
+}
+
+async function onSubmitScore(e) {
+  e.preventDefault();
+  if (!FORMSPREE_ID) return;
+  const form = e.target;
+  const status = document.getElementById("formStatus");
+  const btn = form.querySelector(".submit-btn");
+  status.className = "form-status";
+  status.textContent = "Submitting…";
+  btn.disabled = true;
+
+  try {
+    const data = new FormData(form);
+    const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+      method: "POST",
+      body: data,
+      headers: { "Accept": "application/json" },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    progress.submitted = true;
+    saveProgress();
+    form.hidden = true;
+    status.className = "form-status ok";
+    status.textContent = "✓ Score submitted. Thanks!";
+  } catch (err) {
+    status.className = "form-status err";
+    status.textContent = "✗ Submission failed: " + err.message + " — try again in a moment.";
+    btn.disabled = false;
+  }
+}
+
 bindNav();
 renderHome();
+refreshTimerVisibility();
+refreshNav();
+if (isComplete() && !progress.submitted) {
+  // If a player reloads after completing, show results.
+  renderResults();
+}
