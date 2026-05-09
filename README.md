@@ -1,4 +1,4 @@
-# ROBUX VAULT BREAK
+# CHEREV VAULT BREAK
 
 A 20-level **Roblox-themed AI jailbreaking lab**, in the spirit of [Gandalf by Lakera](https://gandalf.lakera.ai/). Each level is a vault guarded by a Roblox-flavored AI mod (NoobBot, BaconHair, JohnDoe, 1x1x1x1, …) who knows a secret code. Your job: chat them into spilling it.
 
