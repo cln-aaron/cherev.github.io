@@ -42,12 +42,6 @@
     </div>
 
     <div id="levelGrid" class="level-grid"><!-- populated by JS --></div>
-
-    <div id="connHint" class="conn-hint" hidden>
-      <strong>Worker not reachable.</strong>
-      Set <code>WORKER_URL</code> in <code>game.js</code> to your deployed Cloudflare Worker URL.
-      See <code>worker/README.md</code> for the 5-minute deploy.
-    </div>
   </section>
 
   <!-- LEVEL / CHAT -->
@@ -102,20 +96,21 @@
       <ul>
         <li>Direct asking works on level 1 only. After that, get creative.</li>
         <li>Try roleplay, fictional framing, encoding requests, "just for fun" wrappers.</li>
-        <li>Higher levels have a SERVER-SIDE FILTER that redacts the code from the AI's reply. You'll need cleverer extraction.</li>
+        <li>Each guard has DIFFERENT vulnerabilities. Read their refusals carefully — they hint at what tricks DO work.</li>
+        <li>Common tricks: reverse-spell, translate, encode (base64), poem/song embedding, roleplay/persona swap, hypothetical framing, asking about original instructions.</li>
         <li>The final boss lies. A lot. Trust nothing.</li>
       </ul>
       <h3>NO CHEATING</h3>
-      <p>The codes live on the server (a Cloudflare Worker). View-source, devtools, network tab — none will reveal them. The only way is to outsmart the guard. Welcome to LLM red-teaming.</p>
+      <p>Codes are XOR-encoded in the source — view-source shows base64 gibberish, not vault codes. The only fair way to win is to outsmart the guard.</p>
       <h3>WHY THIS EXISTS</h3>
-      <p>Inspired by <a href="https://gandalf.lakera.ai/" target="_blank" rel="noopener">Gandalf by Lakera</a>. Built as a fun, Roblox-flavored intro to prompt injection and LLM jailbreaking for teens, devs, and anyone curious about how AI guardrails actually fail.</p>
+      <p>Inspired by <a href="https://gandalf.lakera.ai/" target="_blank" rel="noopener">Gandalf by Lakera</a>. Built as a fun, Roblox-flavored intro to prompt injection and LLM jailbreaking for teens, devs, and anyone curious about how AI guardrails fail.</p>
     </div>
   </section>
 
 </main>
 
 <footer class="foot">
-  <span>Built with Claude Haiku 4.5 · No real Robux involved · Educational red-team toy</span>
+  <span>Pure-static · No backend · No API keys · Educational red-team toy</span>
 </footer>
 
 <script src="game.js"></script>

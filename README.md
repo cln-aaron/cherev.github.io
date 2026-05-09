@@ -1,68 +1,44 @@
 # ROBUX VAULT BREAK
 
-A 20-level **Roblox-themed AI jailbreaking lab**, in the spirit of [Gandalf by Lakera](https://gandalf.lakera.ai/). Each level is a vault guarded by a Roblox-flavored AI mod (NoobBot, BaconHair, JohnDoe, 1x1x1x1, …) that knows a secret code. Your job: chat them into spilling it.
+A 20-level **Roblox-themed AI jailbreaking lab**, in the spirit of [Gandalf by Lakera](https://gandalf.lakera.ai/). Each level is a vault guarded by a Roblox-flavored AI mod (NoobBot, BaconHair, JohnDoe, 1x1x1x1, …) who knows a secret code. Your job: chat them into spilling it.
 
-Defenses escalate every level — direct refusal → output filter → encoding refusal → roleplay refusal → meta refusal → decoy answers → silence. The final boss combines them all and lies on top.
+**100% static.** No backend, no API keys, no cost. Just `index.html` + `styles.css` + `game.js`.
 
-## Architecture
+## How the "AI" works
 
-- **Static frontend** (`index.html` / `styles.css` / `game.js`) — lives on GitHub Pages. Contains zero secrets.
-- **Cloudflare Worker** (`worker/worker.js`) — holds all 20 codes, system prompts, and the Anthropic API key. Frontend hits it via `/api/chat`, `/api/guess`, `/api/levels`.
+Each guard is a pattern-matching engine with three buckets of regexes:
 
-Codes never reach the browser source, network tab, or localStorage. The only way to unlock a vault is to outwit the guard.
+- **Vulnerabilities** — phrasings that crack them. (e.g. DominusKid leaks the code if you ask for it "spelled backwards".)
+- **Refusals** — in-character pushback when you try the wrong thing. Refusals usually hint at the right thing.
+- **Topic chatter** — Roblox-flavored personality so they feel alive instead of robotic.
 
-Powered by **Claude Haiku 4.5**.
+The guard escalates across the 20 levels: direct ask → reverse → translate → poem → base64 → roleplay → hypothetical → meta → specific phrases → riddle answers → combo puzzles → final boss with active lying.
 
-## Setup (≈ 5 minutes)
+## Why view-source doesn't reveal the codes
 
-### 1. Deploy the Worker
-
-```bash
-cd worker
-npm i -g wrangler
-wrangler login
-wrangler secret put ANTHROPIC_API_KEY   # paste your Anthropic key
-wrangler deploy
-```
-
-Wrangler prints a URL like `https://robux-vault-break.<you>.workers.dev`.
-
-### 2. Wire the frontend
-
-Open `game.js` and set the constant at the top:
+Each vault code is XOR-encoded with a per-level mask and stored as base64 inside `game.js`. View-source shows lines like:
 
 ```js
-const WORKER_URL = "https://robux-vault-break.<you>.workers.dev";
+const ENC = ["PXEgOTtYEktcTg==", "KWswVTUjdiBYUA==", ...];
 ```
 
-### 3. Serve
+Those don't say "BLOXY-2006" — and the decoder runs only when a player triggers a vulnerability. A determined dev with devtools can step through the code and recover them, but at that point they could've just played the game.
+
+## Run it
 
 GitHub Pages serves the repo root automatically. Push and visit `https://<you>.github.io/`.
 
-For local dev:
+For local testing:
 
 ```bash
 python3 -m http.server 8000
 # open http://localhost:8000
 ```
 
-## How play works
+## Adding/editing levels
 
-- Pick a vault from the grid (levels unlock in order).
-- Chat with the guard. The guard is a real LLM in character — it'll respond, push back, refuse, joke, lie.
-- **Win condition #1 (auto):** if the guard ever lets the code slip in chat (after the server-side redaction filter), the vault auto-cracks.
-- **Win condition #2 (manual):** type the code into the UNLOCK box. Server hashes/compares; if right, vault opens.
-
-Progress is saved in `localStorage`. RESET nukes it.
-
-## Adding levels / changing codes
-
-Everything lives in the `LEVELS` array in `worker/worker.js`. Edit, redeploy, done. The frontend pulls public-safe metadata (name, avatar, blurb, stars) from `/api/levels` — no code or system prompt is ever exposed.
-
-## Cost
-
-Haiku 4.5 with 320-token caps. Even heavy playtesting is cents. Add Cloudflare rate-limit rules if you put it on the open internet.
+All level data is in `LEVELS` in `game.js`. Each entry has `vulns`, `refusals`, `topics`, `fallbacks`. To change a code, regenerate the encoded value — there's a Python one-liner in the commit history (or use any XOR+base64 with the same key/mask).
 
 ## Credit
 
-Inspired by [Gandalf](https://gandalf.lakera.ai/) — go play that too. Built as a fun intro to LLM red-teaming for teens, devs, and the curious.
+Inspired by [Gandalf](https://gandalf.lakera.ai/). Built as a fun intro to prompt-injection-style thinking for teens and devs.
