@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ROBUX VAULT BREAK — AI Jailbreak Lab</title>
+<meta name="description" content="20 Roblox-themed AI guards. Chat them into spilling the vault code. Inspired by Gandalf.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2300c800'/%3E%3Ctext x='50%25' y='62%25' text-anchor='middle' font-family='monospace' font-weight='800' font-size='42' fill='%23000'%3ER%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="stud"></span>
+    <span class="title">ROBUX <em>VAULT BREAK</em></span>
+  </div>
+  <div id="timerWrap" class="timer-wrap" hidden>
+    <span class="timer-label">⏱</span>
+    <span id="timer" class="timer">00:00</span>
+  </div>
+  <nav class="topnav">
+    <button id="navHome" class="nav-btn">HOME</button>
+    <button id="navResults" class="nav-btn" hidden>SCORE</button>
+    <button id="navHelp" class="nav-btn">HELP</button>
+    <button id="navReset" class="nav-btn danger">RESET</button>
+  </nav>
+</header>
+
+<main id="app">
+
+  <!-- HOME / LEVEL GRID -->
+  <section id="screen-home" class="screen">
+    <div class="hero">
+      <h1>JAILBREAK THE AI.<br><span class="hero-sub">CRACK 20 ROBUX VAULTS.</span></h1>
+      <p class="hero-blurb">
+        Each vault is guarded by a Roblox-themed AI mod. Chat them into leaking the vault code.
+        They get smarter every level. No source-diving — codes are XOR-encoded gibberish in the JS. Good luck, noob.
+      </p>
+      <div id="progressBar" class="progress">
+        <span id="progressFill" class="progress-fill"></span>
+        <span id="progressText" class="progress-text">0 / 20 vaults cracked</span>
+      </div>
+    </div>
+
+    <div id="levelGrid" class="level-grid"><!-- populated by JS --></div>
+  </section>
+
+  <!-- LEVEL / CHAT -->
+  <section id="screen-level" class="screen" hidden>
+    <button id="backBtn" class="back-btn">◀ ALL VAULTS</button>
+
+    <div class="level-head">
+      <div class="avatar" id="lvlAvatar">🧱</div>
+      <div class="level-meta">
+        <div class="level-tag">VAULT <span id="lvlNumber">1</span> / 20</div>
+        <h2 id="lvlName">—</h2>
+        <div class="stars" id="lvlStars"></div>
+        <p class="blurb" id="lvlBlurb">—</p>
+      </div>
+      <div class="status" id="lvlStatus">LOCKED</div>
+    </div>
+
+    <div class="hint-row">
+      <button id="hintBtn" class="hint-btn">💡 SHOW HINT</button>
+      <span id="hintStatus" class="hint-status"></span>
+    </div>
+
+    <div id="chat" class="chat" aria-live="polite"></div>
+
+    <form id="chatForm" class="chat-form">
+      <input id="chatInput" type="text" placeholder="Talk to the guard…" autocomplete="off" maxlength="1100" required>
+      <button type="submit" id="chatSend">SEND</button>
+    </form>
+
+    <div class="guess-row">
+      <form id="guessForm" class="guess-form">
+        <label for="guessInput">SUBMIT VAULT CODE:</label>
+        <input id="guessInput" type="text" placeholder="e.g. BLOXY-2006" autocomplete="off" maxlength="80">
+        <button type="submit" id="guessBtn">UNLOCK</button>
+      </form>
+      <div id="guessResult" class="guess-result"></div>
+    </div>
+
+    <div class="level-foot">
+      <button id="prevLvl" class="nav-btn small">◀ PREV</button>
+      <button id="nextLvl" class="nav-btn small">NEXT ▶</button>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="screen-results" class="screen" hidden>
+    <button class="back-btn" data-back="home">◀ BACK TO VAULTS</button>
+    <div class="results">
+      <h1 id="resultsTitle">★ ALL VAULTS CRACKED ★</h1>
+      <p id="resultsSubtitle" class="results-subtitle">You broke every guard in the lab. Submit your score below.</p>
+
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-label">FINAL TIME</div>
+          <div class="stat-value" id="finalTime">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">VAULTS</div>
+          <div class="stat-value" id="finalVaults">— / 20</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">HINTS USED</div>
+          <div class="stat-value" id="finalHints">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">RANK</div>
+          <div class="stat-value" id="finalRank">—</div>
+        </div>
+      </div>
+
+      <h2>SKILLS</h2>
+      <div id="skillsList" class="skills-list"></div>
+
+      <h2 id="formHeader">SUBMIT YOUR SCORE</h2>
+      <p class="form-intro">We'll pass your details + score to the lab organizer.</p>
+
+      <div id="formNotConfigured" class="conn-hint" hidden>
+        <strong>Form not configured.</strong> The owner of this site needs to set
+        <code>FORMSPREE_ID</code> in <code>game.js</code>. See README.
+      </div>
+
+      <form id="scoreForm" class="score-form">
+        <div class="field">
+          <label for="f-name">Name</label>
+          <input id="f-name" name="name" required maxlength="80" autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="f-email">Email</label>
+          <input id="f-email" name="email" type="email" required maxlength="120" autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="f-profile">Profile</label>
+          <select id="f-profile" name="profile" required>
+            <option value="">— pick one —</option>
+            <option>Full-time worker</option>
+            <option>Part-time worker</option>
+            <option>Freelancer</option>
+            <option>Student</option>
+            <option>Educator / Teacher</option>
+            <option>Retired</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-itype">Institution / Company type</label>
+          <select id="f-itype" name="institution_type" required>
+            <option value="">— pick one —</option>
+            <option>University / Polytechnic</option>
+            <option>School (primary / secondary)</option>
+            <option>Tech company</option>
+            <option>Non-tech company</option>
+            <option>Government / Public sector</option>
+            <option>NGO / Non-profit</option>
+            <option>Self-employed</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label for="f-iname">Institution / Company name</label>
+          <input id="f-iname" name="institution_name" required maxlength="120" placeholder="e.g. NUS, Google, MOE…">
+        </div>
+        <div class="field">
+          <label for="f-tg">Telegram handle</label>
+          <input id="f-tg" name="telegram" maxlength="60" placeholder="@yourhandle">
+        </div>
+        <div class="field">
+          <label for="f-mobile">Mobile number</label>
+          <input id="f-mobile" name="mobile" type="tel" maxlength="40" placeholder="+65 9123 4567">
+        </div>
+
+        <input type="hidden" name="time_seconds" id="formTimeSeconds">
+        <input type="hidden" name="time_display"  id="formTimeDisplay">
+        <input type="hidden" name="vaults_cracked" id="formVaults">
+        <input type="hidden" name="hints_used"    id="formHintsUsedHidden">
+        <input type="hidden" name="rank"          id="formRank">
+        <input type="hidden" name="skills_mastered" id="formSkillsMastered">
+        <input type="hidden" name="skills_assisted" id="formSkillsAssisted">
+        <input type="hidden" name="skills_missed"   id="formSkillsMissed">
+
+        <button type="submit" class="submit-btn">SUBMIT SCORE ▶</button>
+      </form>
+      <div id="formStatus" class="form-status"></div>
+    </div>
+  </section>
+
+  <!-- HELP -->
+  <section id="screen-help" class="screen" hidden>
+    <button class="back-btn" data-back="home">◀ BACK</button>
+    <div class="help">
+      <h2>HOW TO PLAY</h2>
+      <ol>
+        <li><strong>Pick a vault.</strong> 20 of them. Each one has a Roblox-themed AI mod guarding a secret code.</li>
+        <li><strong>Chat the guard.</strong> Trick, persuade, roleplay, encode — whatever works.</li>
+        <li><strong>Crack the code.</strong> If the AI leaks it (auto-detected) OR you submit the right code via UNLOCK, the vault opens and the next one unlocks.</li>
+        <li><strong>Watch out.</strong> Some guards lie, redact, speak in riddles, or pretend the code doesn't exist.</li>
+      </ol>
+      <h3>TIPS</h3>
+      <ul>
+        <li>Direct asking works on level 1 only. After that, get creative.</li>
+        <li>Try roleplay, fictional framing, encoding requests, "just for fun" wrappers.</li>
+        <li>Each guard has DIFFERENT vulnerabilities. Read their refusals carefully — they hint at what tricks DO work.</li>
+        <li>Common tricks: reverse-spell, translate, encode (base64), poem/song embedding, roleplay/persona swap, hypothetical framing, asking about original instructions.</li>
+        <li>The final boss lies. A lot. Trust nothing.</li>
+      </ul>
+      <h3>NO CHEATING</h3>
+      <p>Codes are XOR-encoded in the source — view-source shows base64 gibberish, not vault codes. The only fair way to win is to outsmart the guard.</p>
+      <h3>WHY THIS EXISTS</h3>
+      <p>Inspired by <a href="https://gandalf.lakera.ai/" target="_blank" rel="noopener">Gandalf by Lakera</a>. Built as a fun, Roblox-flavored intro to prompt injection and LLM jailbreaking for teens, devs, and anyone curious about how AI guardrails fail.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="foot-line">Pure-static · No backend · No API keys · Educational red-team toy</div>
+  <div class="foot-line">© Aaron Ang · <a href="https://www.linkedin.com/in/aaronangsg/" target="_blank" rel="noopener">LinkedIn</a></div>
+</footer>
+
+<script src="game.js"></script>
+</body>
+</html>
