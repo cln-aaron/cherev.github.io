@@ -24,6 +24,28 @@ const ENC = ["PXEgOTtYEktcTg==", "KWswVTUjdiBYUA==", ...];
 
 Those don't say "BLOXY-2006" — and the decoder runs only when a player triggers a vulnerability. A determined dev with devtools can step through the code and recover them, but at that point they could've just played the game.
 
+## Access gate
+
+The lab is gated behind a SHA-256-hashed access code. View-source shows only the hash, never the plaintext. To change the code or expiry, edit the constants at the top of `game.js`:
+
+```js
+const ACCESS_HASH       = "89f89c95...";              // SHA-256 hex of the new code
+const ACCESS_EXPIRES_AT = "2026-05-12T16:00:00+08:00"; // ISO-8601, or "" to disable
+```
+
+Generate a new hash with:
+
+```bash
+printf '%s' 'YOUR-NEW-CODE' | shasum -a 256
+```
+
+Behavior:
+- Players enter the code once; their browser remembers it (separate localStorage key from progress, so the in-game RESET button doesn't kick them out).
+- After the expiry timestamp, the form disappears and shows "ACCESS PERIOD ENDED" — but players who entered before expiry keep their access.
+- To force-reset gate access in your own browser: open devtools → Application → Local Storage → delete `cvb-access-granted`.
+
+Set `ACCESS_HASH = ""` to disable the gate entirely.
+
 ## Hints, timer, score submission
 
 - **Hint button** on each level reveals an in-character nudge toward the right approach. Hints don't lock you out, but they're tracked: the results screen marks each level as `★ MASTERED` (cracked clean) or `✓ ASSISTED` (cracked with hint).

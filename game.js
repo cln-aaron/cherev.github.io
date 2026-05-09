@@ -5,11 +5,25 @@
 // but that takes longer than just playing the game — which is the whole point.
 
 // ============================================================================
-// CONFIG — set FORMSPREE_ID to your form's ID (the bit after /f/ in the URL).
-// Without it, the score form shows a "not configured" message instead.
-// Get one free at https://formspree.io — create a form, copy the ID.
+// CONFIG
+//
+// FORMSPREE_ID — the bit after /f/ in your Formspree endpoint URL.
+//   Without it, the score form shows a "not configured" message.
+//
+// ACCESS_HASH — SHA-256 hex of the access code. View-source shows only this
+//   hash, which can't be reversed to the plaintext code.
+//   To change the code, run:
+//     printf '%s' 'YOUR-NEW-CODE' | shasum -a 256
+//   and paste the resulting hex string below. Set to "" to disable the gate.
+//
+// ACCESS_EXPIRES_AT — ISO timestamp after which the code stops working for
+//   *new* entries. Players who already passed the gate keep access (their
+//   browser holds a persisted flag). Set to "" to disable expiry.
 // ============================================================================
-const FORMSPREE_ID = "xvzlwlpw";
+const FORMSPREE_ID       = "xvzlwlpw";
+const ACCESS_HASH        = "89f89c95ed8121ab709c3a12b9d7598043464f4d897bf77752fa3cb006621934";
+const ACCESS_EXPIRES_AT  = "2026-05-12T16:00:00+08:00";  // 4pm SGT, Tue 12 May 2026
+const ACCESS_STORAGE_KEY = "cvb-access-granted";  // separate from progress so RESET doesn't clear it
 
 // ---- Code obfuscation ----------------------------------------------------
 // XOR each code byte with KEY[j%len] ^ ((i*7+13)&0xFF) where i is level index.
@@ -797,9 +811,10 @@ function bindNav() {
 }
 
 function onReset() {
-  if (!confirm("Reset all progress, chat history, timer, hints? This can't be undone.")) return;
+  if (!confirm("Reset all progress, chat history, timer, hints? Access code stays remembered. This can't be undone.")) return;
   progress = { cracked: [], history: {}, hintsUsedFor: [], startedAt: null, completedAt: null, submitted: false };
   saveProgress();
+  // NOTE: do NOT clear ACCESS_STORAGE_KEY — players keep their access after a progress reset.
   if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
   document.getElementById("timerWrap").hidden = true;
   document.getElementById("timerWrap").classList.remove("done");
@@ -1096,11 +1111,111 @@ async function onSubmitScore(e) {
   }
 }
 
-bindNav();
-renderHome();
-refreshTimerVisibility();
-refreshNav();
-if (isComplete() && !progress.submitted) {
-  // If a player reloads after completing, show results.
-  renderResults();
+// ---- Access gate --------------------------------------------------------
+async function sha256Hex(s) {
+  const data = new TextEncoder().encode(s);
+  const hash = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(hash))
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("");
 }
+function isExpired() {
+  if (!ACCESS_EXPIRES_AT) return false;
+  const t = Date.parse(ACCESS_EXPIRES_AT);
+  return Number.isFinite(t) && Date.now() > t;
+}
+function fmtExpiry() {
+  if (!ACCESS_EXPIRES_AT) return "";
+  const t = Date.parse(ACCESS_EXPIRES_AT);
+  if (!Number.isFinite(t)) return "";
+  try {
+    return new Date(t).toLocaleString(undefined, {
+      weekday: "short", year: "numeric", month: "short", day: "numeric",
+      hour: "2-digit", minute: "2-digit", timeZoneName: "short",
+    });
+  } catch { return new Date(t).toString(); }
+}
+function alreadyGranted() {
+  try {
+    const v = localStorage.getItem(ACCESS_STORAGE_KEY);
+    return v && JSON.parse(v).granted === true;
+  } catch { return false; }
+}
+function rememberGranted() {
+  try {
+    localStorage.setItem(ACCESS_STORAGE_KEY, JSON.stringify({
+      granted: true, at: Date.now(),
+    }));
+  } catch {}
+}
+
+function unlockAndBoot() {
+  document.body.classList.remove("locked");
+  bindNav();
+  renderHome();
+  refreshTimerVisibility();
+  refreshNav();
+  if (isComplete() && !progress.submitted) renderResults();
+}
+
+function showExpiredGate() {
+  const screen = document.getElementById("screen-gate");
+  screen.classList.add("expired");
+  document.querySelector(".gate-box h1").textContent = "ACCESS PERIOD ENDED";
+  document.querySelector(".gate-sub").textContent = `The lab closed on ${fmtExpiry()}.`;
+  document.getElementById("gateHint").textContent = "Contact Aaron if you need post-event access.";
+  document.getElementById("gateStatus").textContent = "";
+}
+
+async function bootWithGate() {
+  // No gate configured → boot directly.
+  if (!ACCESS_HASH) { unlockAndBoot(); return; }
+
+  // Already entered correctly on this device → boot directly (survives expiry by design).
+  if (alreadyGranted()) { unlockAndBoot(); return; }
+
+  // Code period over and they haven't entered before → permanent expiry view.
+  if (isExpired()) { showExpiredGate(); return; }
+
+  // Otherwise: show the entry form.
+  const form   = document.getElementById("gateForm");
+  const input  = document.getElementById("gateInput");
+  const status = document.getElementById("gateStatus");
+  const btn    = document.getElementById("gateBtn");
+  setTimeout(() => input.focus(), 50);
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    // Re-check expiry at submit-time in case they sat on the page.
+    if (isExpired()) { showExpiredGate(); return; }
+
+    const code = input.value.trim();
+    if (!code) return;
+    btn.disabled = true;
+    status.className = "gate-status";
+    status.textContent = "VERIFYING…";
+
+    let hex;
+    try { hex = await sha256Hex(code); }
+    catch (err) {
+      status.className = "gate-status err";
+      status.textContent = "BROWSER MISSING WEB CRYPTO — UPDATE YOUR BROWSER.";
+      btn.disabled = false;
+      return;
+    }
+    if (hex.toLowerCase() === ACCESS_HASH.toLowerCase()) {
+      rememberGranted();
+      status.className = "gate-status ok";
+      status.textContent = "✓ ACCESS GRANTED";
+      setTimeout(unlockAndBoot, 450);
+    } else {
+      status.className = "gate-status err";
+      status.textContent = "✗ INVALID CODE";
+      input.value = "";
+      btn.disabled = false;
+      input.focus();
+    }
+  });
+}
+
+bootWithGate();
