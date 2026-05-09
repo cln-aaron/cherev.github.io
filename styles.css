@@ -519,12 +519,12 @@ body:not(.locked) > #screen-gate { display: none; }
   position: fixed; inset: 0;
   z-index: 9999;
   display: flex;
-  align-items: center;
+  align-items: safe center;     /* center when it fits, top-align when it overflows */
   justify-content: center;
   background:
     radial-gradient(800px 500px at 50% 50%, #1c2230 0%, #0a0d12 70%),
     var(--bg);
-  padding: 24px;
+  padding: 24px 20px;
   overflow-y: auto;
 }
 .gate-wrap {
@@ -544,7 +544,8 @@ body:not(.locked) > #screen-gate { display: none; }
   position: relative;
   width: 140px;
   flex-shrink: 0;
-  padding-bottom: 14px;
+  padding-top: 78px;        /* room for the speech bubble above */
+  padding-bottom: 14px;     /* room for the stud platform */
   margin-bottom: 4px;
   animation: char-bob 2.4s ease-in-out infinite;
 }
@@ -600,50 +601,60 @@ body:not(.locked) > #screen-gate { display: none; }
   .aaron-bubble .bubble { animation: none !important; }
 }
 
-/* Speech bubble */
+/* Speech bubble — sits in the reserved top area of the stage, centered */
 .aaron-bubble {
   position: absolute;
-  top: -8px;
-  right: -6px;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 240px;
+  max-width: calc(100vw - 56px);
+  height: 70px;
   z-index: 2;
   font-family: "Press Start 2P", monospace;
-  font-size: 11px;
-  letter-spacing: 1px;
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: 0.5px;
+  pointer-events: none;
 }
 .aaron-bubble .bubble {
-  display: block;
   position: absolute;
-  top: 0; right: 0;
+  left: 50%;
+  bottom: 12px;
   background: #fff;
   color: #0e1116;
   border: 2px solid #000;
-  border-radius: 8px;
-  padding: 8px 12px;
-  white-space: nowrap;
+  border-radius: 10px;
+  padding: 9px 12px;
+  text-align: center;
+  white-space: normal;
   opacity: 0;
-  transform: scale(0.8);
+  transform: translateX(-50%) scale(0.7);
   box-shadow: 4px 4px 0 #0008;
+  width: max-content;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 .aaron-bubble .bubble::after {
   content: "";
   position: absolute;
   bottom: -8px;
-  left: 14px;
+  left: 50%;
+  margin-left: -6px;
   width: 12px; height: 12px;
   background: #fff;
   border-right: 2px solid #000;
   border-bottom: 2px solid #000;
   transform: rotate(45deg);
 }
-.aaron-bubble .bubble-1 { animation: bubble-pop 9s infinite; }
-.aaron-bubble .bubble-2 { animation: bubble-pop 9s 3s infinite; }
-.aaron-bubble .bubble-3 { animation: bubble-pop 9s 6s infinite; }
-@keyframes bubble-pop {
-  0%   { opacity: 0; transform: scale(0.7); }
-  4%   { opacity: 1; transform: scale(1); }
-  28%  { opacity: 1; transform: scale(1); }
-  33%  { opacity: 0; transform: scale(0.7); }
-  100% { opacity: 0; }
+.aaron-bubble .bubble-1 { animation: bubble-cycle 7s linear infinite; }
+.aaron-bubble .bubble-2 { animation: bubble-cycle 7s linear -3.5s infinite; }
+@keyframes bubble-cycle {
+  0%   { opacity: 0; transform: translateX(-50%) scale(0.7); }
+  5%   { opacity: 1; transform: translateX(-50%) scale(1); }
+  45%  { opacity: 1; transform: translateX(-50%) scale(1); }
+  50%  { opacity: 0; transform: translateX(-50%) scale(0.7); }
+  100% { opacity: 0; transform: translateX(-50%) scale(0.7); }
 }
 
 .gate-box {
@@ -736,9 +747,14 @@ body:not(.locked) > #screen-gate { display: none; }
   .gate-form { flex-direction: column; }
   .gate-form input,
   .gate-form button { width: 100%; font-size: 13px; }
-  .aaron-stage { width: 110px; padding-bottom: 10px; }
-  .aaron-platform { width: 100px; height: 14px; margin-left: -50px; }
-  .aaron-bubble { font-size: 9px; }
+  .aaron-stage {
+    width: 120px;
+    padding-top: 68px;
+    padding-bottom: 10px;
+  }
+  .aaron-platform { width: 110px; height: 14px; margin-left: -55px; }
+  .aaron-bubble { font-size: 9px; height: 60px; width: 200px; }
+  .aaron-bubble .bubble { padding: 7px 10px; }
 }
 
 /* ---- Timer ---- */
