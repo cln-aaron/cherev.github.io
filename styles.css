@@ -125,6 +125,15 @@ main, header, footer { position: relative; z-index: 1; }
   color: var(--ink-dim);
   font-size: 15px;
 }
+.hero-credit {
+  margin: 12px auto 0;
+  font-size: 12px;
+  color: var(--ink-dim);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.hero-credit a { color: var(--brick-glow); text-decoration: none; font-weight: 700; }
+.hero-credit a:hover { text-decoration: underline; }
 .progress {
   margin: 22px auto 0;
   max-width: 520px;
@@ -516,7 +525,126 @@ body:not(.locked) > #screen-gate { display: none; }
     radial-gradient(800px 500px at 50% 50%, #1c2230 0%, #0a0d12 70%),
     var(--bg);
   padding: 24px;
+  overflow-y: auto;
 }
+.gate-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  max-width: 880px;
+  width: 100%;
+}
+@media (max-width: 760px) {
+  .gate-wrap { flex-direction: column; gap: 12px; }
+}
+
+/* Aaron-Roblox character */
+.aaron-stage {
+  position: relative;
+  width: 240px;
+  flex-shrink: 0;
+  padding-bottom: 18px;
+  animation: char-bob 2.4s ease-in-out infinite;
+}
+.aaron-char {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 6px 0 #0006);
+}
+.aaron-platform {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 200px;
+  height: 22px;
+  margin-left: -100px;
+  background: var(--brick);
+  background-image: var(--stud);
+  background-size: 26px 22px;
+  border: 2px solid #000;
+  border-bottom-width: 4px;
+  border-radius: 4px;
+  z-index: -1;
+}
+@keyframes char-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+.aaron-char .arm-right {
+  transform-origin: 186px 158px;
+  animation: arm-wave 3.8s ease-in-out infinite;
+}
+@keyframes arm-wave {
+  0%, 55%, 100% { transform: rotate(0deg); }
+  62% { transform: rotate(-22deg); }
+  72% { transform: rotate(-12deg); }
+  82% { transform: rotate(-22deg); }
+  92% { transform: rotate(0deg); }
+}
+.aaron-char .eye {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: blink 4.7s linear infinite;
+}
+@keyframes blink {
+  0%, 91%, 95%, 100% { transform: scaleY(1); }
+  93%                { transform: scaleY(0.08); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aaron-stage,
+  .aaron-char .arm-right,
+  .aaron-char .eye,
+  .aaron-bubble .bubble { animation: none !important; }
+}
+
+/* Speech bubble */
+.aaron-bubble {
+  position: absolute;
+  top: -8px;
+  right: -6px;
+  z-index: 2;
+  font-family: "Press Start 2P", monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+.aaron-bubble .bubble {
+  display: block;
+  position: absolute;
+  top: 0; right: 0;
+  background: #fff;
+  color: #0e1116;
+  border: 2px solid #000;
+  border-radius: 8px;
+  padding: 8px 12px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: scale(0.8);
+  box-shadow: 4px 4px 0 #0008;
+}
+.aaron-bubble .bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 14px;
+  width: 12px; height: 12px;
+  background: #fff;
+  border-right: 2px solid #000;
+  border-bottom: 2px solid #000;
+  transform: rotate(45deg);
+}
+.aaron-bubble .bubble-1 { animation: bubble-pop 9s infinite; }
+.aaron-bubble .bubble-2 { animation: bubble-pop 9s 3s infinite; }
+.aaron-bubble .bubble-3 { animation: bubble-pop 9s 6s infinite; }
+@keyframes bubble-pop {
+  0%   { opacity: 0; transform: scale(0.7); }
+  4%   { opacity: 1; transform: scale(1); }
+  28%  { opacity: 1; transform: scale(1); }
+  33%  { opacity: 0; transform: scale(0.7); }
+  100% { opacity: 0; }
+}
+
 .gate-box {
   width: 100%;
   max-width: 460px;
@@ -528,6 +656,17 @@ body:not(.locked) > #screen-gate { display: none; }
   text-align: center;
   box-shadow: 0 0 60px #2ee62e22;
 }
+.gate-credit {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 2px dashed #0006;
+  font-size: 11px;
+  color: var(--ink-dim);
+  letter-spacing: 1px;
+}
+.gate-credit a { color: var(--brick-glow); text-decoration: none; font-weight: 700; }
+.gate-credit a:hover { text-decoration: underline; }
+
 .gate-emoji { font-size: 48px; margin-bottom: 8px; }
 .gate-box h1 {
   font-family: "Press Start 2P", monospace;
@@ -596,6 +735,9 @@ body:not(.locked) > #screen-gate { display: none; }
   .gate-form { flex-direction: column; }
   .gate-form input,
   .gate-form button { width: 100%; font-size: 13px; }
+  .aaron-stage { width: 180px; padding-bottom: 14px; }
+  .aaron-platform { width: 160px; height: 18px; margin-left: -80px; }
+  .aaron-bubble { font-size: 9px; }
 }
 
 /* ---- Timer ---- */
