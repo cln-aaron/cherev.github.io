@@ -529,40 +529,41 @@ body:not(.locked) > #screen-gate { display: none; }
 }
 .gate-wrap {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  gap: 28px;
-  max-width: 880px;
+  gap: 18px;
+  max-width: 720px;
   width: 100%;
 }
 @media (max-width: 760px) {
-  .gate-wrap { flex-direction: column; gap: 12px; }
+  .gate-wrap { flex-direction: column; align-items: center; gap: 8px; }
 }
 
-/* Aaron-Roblox character */
+/* Aaron-Roblox character (small side accent, not the focal point) */
 .aaron-stage {
   position: relative;
-  width: 240px;
+  width: 140px;
   flex-shrink: 0;
-  padding-bottom: 18px;
+  padding-bottom: 14px;
+  margin-bottom: 4px;
   animation: char-bob 2.4s ease-in-out infinite;
 }
 .aaron-char {
   width: 100%;
   height: auto;
   display: block;
-  filter: drop-shadow(0 6px 0 #0006);
+  filter: drop-shadow(0 4px 0 #0006);
 }
 .aaron-platform {
   position: absolute;
   bottom: 0;
   left: 50%;
-  width: 200px;
-  height: 22px;
-  margin-left: -100px;
+  width: 130px;
+  height: 16px;
+  margin-left: -65px;
   background: var(--brick);
   background-image: var(--stud);
-  background-size: 26px 22px;
+  background-size: 22px 16px;
   border: 2px solid #000;
   border-bottom-width: 4px;
   border-radius: 4px;
@@ -573,7 +574,7 @@ body:not(.locked) > #screen-gate { display: none; }
   50%      { transform: translateY(-7px); }
 }
 .aaron-char .arm-right {
-  transform-origin: 186px 158px;
+  transform-origin: 165px 158px;
   animation: arm-wave 3.8s ease-in-out infinite;
 }
 @keyframes arm-wave {
@@ -735,8 +736,8 @@ body:not(.locked) > #screen-gate { display: none; }
   .gate-form { flex-direction: column; }
   .gate-form input,
   .gate-form button { width: 100%; font-size: 13px; }
-  .aaron-stage { width: 180px; padding-bottom: 14px; }
-  .aaron-platform { width: 160px; height: 18px; margin-left: -80px; }
+  .aaron-stage { width: 110px; padding-bottom: 10px; }
+  .aaron-platform { width: 100px; height: 14px; margin-left: -50px; }
   .aaron-bubble { font-size: 9px; }
 }
 
