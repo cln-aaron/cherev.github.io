@@ -14,7 +14,22 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2300c800'/%3E%3Ctext x='50%25' y='62%25' text-anchor='middle' font-family='monospace' font-weight='800' font-size='42' fill='%23000'%3ER%3C/text%3E%3C/svg%3E">
 </head>
-<body>
+<body class="locked">
+
+<!-- ACCESS GATE -->
+<div id="screen-gate" class="gate-screen">
+  <div class="gate-box">
+    <div class="gate-emoji">🔐</div>
+    <h1>ACCESS REQUIRED</h1>
+    <p class="gate-sub">Enter the access code to unlock the lab.</p>
+    <form id="gateForm" class="gate-form" autocomplete="off">
+      <input id="gateInput" type="password" placeholder="ACCESS CODE" autocomplete="off" autocapitalize="characters" spellcheck="false" required>
+      <button type="submit" id="gateBtn">UNLOCK ▶</button>
+    </form>
+    <div id="gateStatus" class="gate-status"></div>
+    <p class="gate-hint" id="gateHint">Don't have a code? Ask Aaron.</p>
+  </div>
+</div>
 
 <header class="topbar">
   <div class="brand">
