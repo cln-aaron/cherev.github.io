@@ -1177,15 +1177,24 @@ function renderResults() {
     grid.appendChild(el);
   }
 
-  // Hidden form fields
+  // Hidden form fields (what actually gets submitted to Formspree)
+  const timeStr   = progress.startedAt ? fmtTime(elapsedMs()) : "—";
+  const hintsStr  = penalty > 0 ? `${hints} (+${fmtTime(penalty * 1000)})` : "0";
+  const vaultsStr = `${vaults} / ${LEVELS.length}`;
   document.getElementById("formTimeSeconds").value     = String(seconds);
-  document.getElementById("formTimeDisplay").value     = fmtTime(elapsedMs());
-  document.getElementById("formVaults").value          = `${vaults} / ${LEVELS.length}`;
+  document.getElementById("formTimeDisplay").value     = timeStr;
+  document.getElementById("formVaults").value          = vaultsStr;
   document.getElementById("formHintsUsedHidden").value = `${hints} (penalty +${penalty}s)`;
   document.getElementById("formRank").value            = rank;
   document.getElementById("formSkillsMastered").value  = mastered.join(", ");
   document.getElementById("formSkillsAssisted").value  = assisted.join(", ");
   document.getElementById("formSkillsMissed").value    = missed.join(", ");
+
+  // Visible read-only summary that mirrors the hidden fields above.
+  document.getElementById("f-time-display").textContent   = timeStr;
+  document.getElementById("f-vaults-display").textContent = vaultsStr;
+  document.getElementById("f-hints-display").textContent  = hintsStr;
+  document.getElementById("f-rank-display").textContent   = rank;
 
   // Form configured?
   const notConf = document.getElementById("formNotConfigured");

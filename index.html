@@ -219,6 +219,15 @@
       </div>
 
       <form id="scoreForm" class="score-form">
+        <div class="auto-summary" aria-label="Auto-submitted score">
+          <div class="auto-summary-label">📤 AUTO-SUBMITTED WITH YOUR ENTRY</div>
+          <div class="auto-summary-grid">
+            <div class="auto-cell"><span class="k">TIME</span><span class="v" id="f-time-display">—</span></div>
+            <div class="auto-cell"><span class="k">VAULTS</span><span class="v" id="f-vaults-display">—</span></div>
+            <div class="auto-cell"><span class="k">HINTS</span><span class="v" id="f-hints-display">—</span></div>
+            <div class="auto-cell"><span class="k">RANK</span><span class="v" id="f-rank-display">—</span></div>
+          </div>
+        </div>
         <div class="field">
           <label for="f-name">Name</label>
           <input id="f-name" name="name" required maxlength="80" autocomplete="name">
