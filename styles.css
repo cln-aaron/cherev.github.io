@@ -757,6 +757,79 @@ body:not(.locked) > #screen-gate { display: none; }
   .aaron-bubble .bubble { padding: 7px 10px; }
 }
 
+/* ---- Mini Aaron (desktop-only corner mascot) ---- */
+.aaron-mini {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  width: 110px;
+  z-index: 50;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+body.locked .aaron-mini { display: none; }
+
+.aaron-mini-bubble {
+  position: relative;
+  background: #fff;
+  color: #0e1116;
+  border: 2px solid #000;
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 9px;
+  line-height: 1.5;
+  margin-bottom: 8px;
+  text-align: center;
+  max-width: 180px;
+  white-space: normal;
+  box-shadow: 3px 3px 0 #0008;
+  opacity: 0;
+  transform: translateY(4px) scale(0.9);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.aaron-mini-bubble.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.aaron-mini-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  margin-left: -6px;
+  width: 12px; height: 12px;
+  background: #fff;
+  border-right: 2px solid #000;
+  border-bottom: 2px solid #000;
+  transform: rotate(45deg);
+}
+
+.aaron-mini-stage {
+  position: relative;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  animation: char-bob 2.4s ease-in-out infinite;
+  filter: drop-shadow(0 3px 0 #0006);
+}
+.aaron-mini-stage:hover { transform: scale(1.04); }
+.aaron-mini-stage svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Hide on phones — keeps level chat + score form clean */
+@media (max-width: 760px) {
+  .aaron-mini { display: none !important; }
+}
+
 /* ---- Timer ---- */
 .timer-wrap {
   display: flex; align-items: center; gap: 8px;
